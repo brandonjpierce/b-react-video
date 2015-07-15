@@ -1,0 +1,114 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  padding: 64px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cf:before,
+.cf:after {
+    content: " ";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    *zoom: 1;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+.video-media-container {
+  background: #212121;
+}
+
+.video-controls {
+  background: #212121;
+  display: flex;
+}
+
+.control-btn,
+.control-label {
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  width: 64px;
+  float: left;
+  color: #727272;
+  transition: all 250ms ease;
+}
+
+.control-btn {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.control-btn:hover {
+  color: #fff;
+}
+
+.control-label {
+  width: auto;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.control-seeker {
+  flex: 1;
+  padding: 0 8px;
+}
+
+.control-playpause {
+  color: #fff;
+  margin-left: 0;
+}
+
+.control-playpause:hover {
+  background: #455A64;
+}
+
+.control-timestamp {
+  margin-left: 32px;
+}
+
+.control-duration {
+  margin-right: 32px;
+}
+
+.control-sound,
+.control-fullscreen {
+  width: 48px;
+}
+
+.seeker-bar-container {
+  height: 16px;
+  border-radius: 8px;
+  background: #455A64;
+  margin: 24px 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.seeker-bar-current {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #448AFF;
+  border-radius: 8px;
+}
