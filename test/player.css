@@ -111,4 +111,23 @@ video {
   bottom: 0;
   background: #448AFF;
   border-radius: 8px;
+  z-index: 2;
+  transition: all 100ms ease;
+}
+
+.seeker-bar-buffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #424242;
+  border-radius: 8px;
+  z-index: 1;
+  transition: all 100ms ease;
+}
+
+.seeker-bar-timestamp {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
 }

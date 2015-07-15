@@ -1,6 +1,6 @@
 import React from 'react';
 import throttle from 'lodash.throttle';
-import toVideoDuration from 'utils/duration';
+import Controls from 'controls';
 
 export default class Video extends React.Component {
 
@@ -13,17 +13,16 @@ export default class Video extends React.Component {
       width: 0,
       duration: 0,
       playing: false,
-      timestamp: '00:00',
+      timestamp: 0,
       volume: 0,
-      muted: false
-    }
+      muted: false,
+      buffered: 0
+    };
 
     this.onThrottledResize = throttle(
       this.onContainerResize.bind(this),
       250
     );
-
-    this.renderControls = this.renderControls.bind(this);
   }
 
   componentWillMount() {
@@ -35,7 +34,7 @@ export default class Video extends React.Component {
 
     player.addEventListener(
       'loadedmetadata',
-      this.onPlayerLoaded.bind(this, player),
+      this.onPlayerLoaded.bind(this),
       false
     );
 
@@ -44,30 +43,67 @@ export default class Video extends React.Component {
       this.onTimeUpdate.bind(this),
       false
     );
+    
+    player.addEventListener(
+      'durationchange',
+      this.onDurationChange.bind(this),
+      false
+    );
+    
+    player.addEventListener(
+      'ended',
+      this.onEnded.bind(this),
+      false
+    );
+    
+    player.addEventListener(
+      'progress',
+      this.onBuffer.bind(this),
+      false
+    );
   }
 
-  onPlayerLoaded(player, e) {
+  onPlayerLoaded(e) {
+    let player = this.refs.player.getDOMNode();
     let container = this.refs.container.getDOMNode();
-
+    
     this.setState({
       ready: true,
       player: player,
       width: container.clientWidth,
-      duration: toVideoDuration(e.target.duration),
+      duration: e.target.duration,
       volume: e.target.volume,
       muted: e.target.muted
+    });
+  }
+  
+  onEnded() {
+    this.setState({
+      playing: false
+    });
+  }
+  
+  onDurationChange(e) {
+    this.setState({
+      duration: e.target.duration
     });
   }
 
   onContainerResize() {
     let container = this.refs.container.getDOMNode();
-    this.setState({ width: container.clientWidth });
+    
+    this.setState({
+      width: container.clientWidth
+    });
   }
 
-  onPlayPause() {
-    this.setState({ playing: !this.state.playing });
+  onPlayback() {
+    this.setState({
+      playing: !this.state.playing
+    });
 
     let method = this.state.playing ? 'pause' : 'play';
+    
     this.state.player[method]();
   }
 
@@ -79,52 +115,34 @@ export default class Video extends React.Component {
 
   onTimeUpdate(e) {
     this.setState({
-      timestamp: toVideoDuration(e.target.currentTime),
+      timestamp: e.target.currentTime,
       progress: Math.floor((100 / e.target.duration) * e.target.currentTime)
     });
   }
-
-  renderControls() {
-    let playPauseIcon = this.state.playing ?
-      <span className="fa fa-pause"></span> :
-      <span className="fa fa-play"></span>;
-
-    let muteUnmuteIcon = this.state.muted ?
-      <span className="fa fa-volume-off"></span> :
-      <span className="fa fa-volume-up"></span>;
-
-    return (
-      <div className="video-controls cf">
-        <div className="control-playpause control-btn" onClick={this.onPlayPause.bind(this)}>
-          {playPauseIcon}
-        </div>
-        <div className="control-timestamp control-label">
-          {this.state.timestamp}
-        </div>
-        <div className="control-seeker">
-          <div className="seeker-bar-container">
-            <div className="seeker-bar-current" style={{
-              width: this.state.progress + '%'
-            }}></div>
-          </div>
-        </div>
-        <div className="control-duration control-label">
-          {this.state.duration}
-        </div>
-        <div className="control-cc control-btn">
-          <span className="fa fa-cc"></span>
-        </div>
-        <div className="control-sound control-btn" onClick={this.onMuteUnmute.bind(this)}>
-          {muteUnmuteIcon}
-        </div>
-        <div className="control-fullscreen control-btn">
-          <span className="fa fa-expand"></span>
-        </div>
-      </div>
-    );
+  
+  onSeek(timestamp) {
+    this.setState({
+      timestamp: timestamp,
+      progress: Math.floor((100 / this.state.duration) * timestamp)
+    }, () => {
+      this.state.player.currentTime = timestamp;
+    });
+  }
+  
+  onBuffer(e) {
+    let player = e.target;
+    
+    if (player.buffered.length && this.state.buffered !== 100) {
+      this.setState({
+        buffered: player.buffered.end(0) / player.duration * 100
+      }, () => {
+        console.log(this.state);
+      });
+    }
   }
 
   render() {
+    
     return (
       <div className="video-container" ref="container">
         <div className="video-media-container">
@@ -134,7 +152,11 @@ export default class Video extends React.Component {
         </div>
         {
           this.state.ready ?
-          this.renderControls() :
+          <Controls
+            {...this.state}
+            onPlayback={this.onPlayback.bind(this)}
+            onSeek={this.onSeek.bind(this)}
+          /> :
           null
         }
       </div>
@@ -143,6 +165,6 @@ export default class Video extends React.Component {
 }
 
 React.render(
-  <Video src="http://video-js.zencoder.com/oceans-clip.mp4" type="mp4" />,
+  <Video src="http://videos.thisisepic.com/2b9c1bf3-e19b-4be5-9d36-246c5d3607d8/high.mp4" type="mp4" />,
   document.getElementById('test-player')
 );
