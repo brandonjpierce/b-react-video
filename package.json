@@ -11,12 +11,12 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^5.6.20",
-    "babel-loader": "^5.3.1",
-    "node-libs-browser": "^0.5.2",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "node-libs-browser": "^2.0.0",
     "webpack": "^1.10.1"
   },
   "dependencies": {
-    "lodash.throttle": "^3.0.4"
+    "lodash.throttle": "^4.1.1"
   }
 }
